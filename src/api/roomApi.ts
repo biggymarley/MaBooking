@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://mabookingbackend.onrender.com/api';
 
 export interface RoomFormData {
   name: string;

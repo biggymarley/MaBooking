@@ -1,7 +1,7 @@
 // services/api/bookingManagementApi.ts
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://mabookingbackend.onrender.com/api';
 
 export interface Booking {
     _id: string;
