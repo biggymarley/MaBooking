@@ -292,22 +292,6 @@ const BookingManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Select
-                        value={booking.status}
-                        onValueChange={(value: 'pending' | 'confirmed' | 'cancelled') =>
-                          handleStatusChange(booking._id, value)
-                        }
-                      >
-                        <SelectTrigger className="w-[110px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="confirmed">Confirm</SelectItem>
-                          <SelectItem value="cancelled">Cancel</SelectItem>
-                        </SelectContent>
-                      </Select>
-
                       <Button
                         variant="destructive"
                         size="icon"

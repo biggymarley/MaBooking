@@ -1,28 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Booking, bookingApi } from '@/api/bookingApi';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import { addDays, format, isBefore, isAfter, parseISO, isWithinInterval, startOfDay } from 'date-fns';
-import { clientRoomApi, BookingData } from '../api/clientRoomApi';
-import { Booking, bookingApi } from '@/api/bookingApi';
+import { addDays, format, isBefore, isWithinInterval, parseISO, startOfDay } from 'date-fns';
+import React, { useEffect, useState } from 'react';
+import { BookingData, clientRoomApi } from '../api/clientRoomApi';
+import { DateRange, SelectRangeEventHandler } from 'react-day-picker';
 
 interface BookingCalendarProps {
   roomId: string;
   onBookingComplete?: () => void;
 }
 
-type DateRange = {
-  from: Date | undefined;
-  to: Date | undefined;
-};
 
-const BookingCalendar: React.FC<BookingCalendarProps> = ({ 
-  roomId, 
-  onBookingComplete 
+
+const BookingCalendar: React.FC<BookingCalendarProps> = ({
+  roomId,
+  onBookingComplete
 }) => {
-  const [selectedRange, setSelectedRange] = useState<DateRange>({
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   });
@@ -54,10 +52,10 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
     const day = startOfDay(date);
     return bookings.some(booking => {
       if (booking.status === 'cancelled') return false;
-      
+
       const startDate = startOfDay(parseISO(booking.startDate));
       const endDate = startOfDay(parseISO(booking.endDate));
-      
+
       return isWithinInterval(day, { start: startDate, end: endDate });
     });
   };
@@ -74,8 +72,8 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
     }
 
     // If selecting end date, can't select dates that would include booked dates
-    if (selectedRange.from && !selectedRange.to) {
-      const start = selectedRange.from;
+    if (selectedRange?.from && !selectedRange?.to) {
+      const start = selectedRange?.from;
       let current = start;
       while (isBefore(current, date)) {
         current = addDays(current, 1);
@@ -87,15 +85,16 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
 
     return false;
   };
-
-  const handleDateSelect = (range: DateRange) => {
-    if (range.from && range.to) {
-      setError(null);
-      setSelectedRange(range);
-      setStep('info');
-    } else {
-      setSelectedRange(range);
+  const handleDateSelect: SelectRangeEventHandler = (range) => {
+    setError(null);
+    setSelectedRange(range);
+  };
+  const handleContinue = () => {
+    if (!selectedRange?.from || !selectedRange?.to) {
+      setError('Please select both check-in and check-out dates');
+      return;
     }
+    setStep('info');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +106,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRange.from || !selectedRange.to) return;
+    if (!selectedRange?.from || !selectedRange?.to) return;
 
     setLoading(true);
     setError(null);
@@ -115,15 +114,15 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
     try {
       const bookingData: BookingData = {
         roomId,
-        startDate: selectedRange.from,
-        endDate: selectedRange.to,
+        startDate: selectedRange?.from,
+        endDate: selectedRange?.to,
         guestName: guestInfo.name,
         guestEmail: guestInfo.email,
         guestPhone: guestInfo.phone
       };
 
       await clientRoomApi.createBooking(bookingData);
-      
+
       if (onBookingComplete) {
         onBookingComplete();
       }
@@ -134,6 +133,8 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
       setLoading(false);
     }
   };
+
+
 
   return (
     <Card>
@@ -157,7 +158,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
               disabled={isDateDisabled}
               modifiers={{ booked: isDateBooked }}
               modifiersStyles={{
-                booked: { 
+                booked: {
                   textDecoration: 'line-through',
                   color: 'red'
                 }
@@ -165,9 +166,17 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
               className="rounded-md border"
             />
 
-            {selectedRange.from && selectedRange.to && (
-              <div className="text-sm text-gray-600">
-                Selected dates: {format(selectedRange.from, 'PPP')} - {format(selectedRange.to, 'PPP')}
+            {selectedRange?.from && selectedRange?.to && (
+              <div className="space-y-4">
+                <div className="text-sm text-gray-600">
+                  Selected dates: {format(selectedRange?.from, 'PPP')} - {format(selectedRange.to, 'PPP')}
+                </div>
+                <Button
+                  className="w-full"
+                  onClick={handleContinue}
+                >
+                  Continue with Selected Dates
+                </Button>
               </div>
             )}
 
