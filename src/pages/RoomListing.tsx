@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -6,14 +6,16 @@ import { clientRoomApi, Room } from '../api/clientRoomApi';
 import BookingCalendar from './BookingCalendar';
 import RoomCarousel from '@/components/RoomCarousel';
 import ImageViewer from '@/components/ImageViewer';
+import { LoadingContext } from '@/context/loadingContext';
 
 const RoomListing: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
+  const context = useContext(LoadingContext);
+  if (!context) throw new Error("LoadingContext must be used within LoadingProvider");
+  const { setLoading } = context;
   useEffect(() => {
     fetchRooms();
   }, []);
@@ -36,13 +38,13 @@ const RoomListing: React.FC = () => {
     return mainImage ? mainImage.url : room.images[0]?.url;
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        Loading rooms...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen">
+  //       Loading rooms...
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return (
@@ -125,8 +127,8 @@ const RoomListing: React.FC = () => {
         </DialogContent>
       </Dialog>
       <ImageViewer
-        imageUrl={selectedImage} 
-        onClose={() => setSelectedImage(null)} 
+        imageUrl={selectedImage}
+        onClose={() => setSelectedImage(null)}
       />
     </div>
   );

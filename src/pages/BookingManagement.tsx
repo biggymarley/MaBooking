@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { bookingApi, Booking } from '../api/bookingApi';
+import { LoadingContext } from '@/context/loadingContext';
 
 const statusIcons = {
   pending: <Clock className="w-4 h-4 text-yellow-500" />,
@@ -45,11 +46,13 @@ const statusColors = {
 const BookingManagement: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<'upcoming' | 'past' | 'all'>('all');
+  const [error, setError] = useState<string | null>(null);
+  const context = useContext(LoadingContext);
+  if (!context) throw new Error("LoadingContext must be used within LoadingProvider");
+  const { setLoading } = context; 
 
   useEffect(() => {
     fetchBookings();
@@ -136,13 +139,13 @@ const BookingManagement: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        Loading bookings...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen">
+  //       Loading bookings...
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -273,24 +276,24 @@ const BookingManagement: React.FC = () => {
                       <span className="capitalize">{booking.status}</span>
                     </div>
                   </TableCell>
-                 
+
                   <TableCell>
                     <div className="flex items-center gap-2">
-                    <Select
-                      value={booking.status}
-                      onValueChange={(value: 'pending' | 'confirmed' | 'cancelled') =>
-                        handleStatusChange(booking._id, value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="confirmed">Confirm</SelectItem>
-                        <SelectItem value="cancelled">Cancel</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <Select
+                        value={booking.status}
+                        onValueChange={(value: 'pending' | 'confirmed' | 'cancelled') =>
+                          handleStatusChange(booking._id, value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="confirmed">Confirm</SelectItem>
+                          <SelectItem value="cancelled">Cancel</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Button
                         variant="destructive"
                         size="icon"
@@ -304,7 +307,7 @@ const BookingManagement: React.FC = () => {
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                      
+
                     </div>
                   </TableCell>
                 </TableRow>

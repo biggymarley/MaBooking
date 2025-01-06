@@ -6,3 +6,9 @@
     --radius: 0.5rem
   }
 }
+
+.font {
+  font-family: "Agbalumo", serif;
+  font-weight: 400;
+  font-style: normal;
+}
