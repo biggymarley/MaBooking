@@ -212,10 +212,10 @@ const BookingManagement: React.FC = () => {
             <TableRow>
               <TableHead>Room</TableHead>
               <TableHead>Guest</TableHead>
-              <TableHead>Contact</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Dates</TableHead>
               <TableHead>Status</TableHead>
+              {/* <TableHead>Status</TableHead> */}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -273,7 +273,9 @@ const BookingManagement: React.FC = () => {
                       <span className="capitalize">{booking.status}</span>
                     </div>
                   </TableCell>
+                 
                   <TableCell>
+                    <div className="flex items-center gap-2">
                     <Select
                       value={booking.status}
                       onValueChange={(value: 'pending' | 'confirmed' | 'cancelled') =>
@@ -289,9 +291,6 @@ const BookingManagement: React.FC = () => {
                         <SelectItem value="cancelled">Cancel</SelectItem>
                       </SelectContent>
                     </Select>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
                       <Button
                         variant="destructive"
                         size="icon"
@@ -305,6 +304,7 @@ const BookingManagement: React.FC = () => {
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                      
                     </div>
                   </TableCell>
                 </TableRow>
